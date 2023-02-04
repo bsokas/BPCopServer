@@ -33,7 +33,7 @@ func startCmdLine() {
         trimmed := strings.TrimSpace(option)
         switch trimmed {
         case "1":
-          inputBP()
+          inputBP(reader)
         case "2":
           inputMeditation()
         case "3":
@@ -50,7 +50,44 @@ func startCmdLine() {
 
 }
 
-func inputBP() { fmt.Println("To be implemented") }
+func cleanReadString(reader *bufio.Reader) string {
+  val, err := reader.ReadString('\n')
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  return val
+}
+
+// result, err := db.Exec("INSERT INTO album (title, artist, price) VALUES (?, ?, ?)", alb.Title, alb.Artist, alb.Price)
+
+func inputBP(reader *bufio.Reader) error {
+  // result, err := BPDatabase.Exec("")
+  fmt.Printf("Systolic reading (mm Hg): ")
+  systolic, sysErr := ValidatePressure(cleanReadString(reader))
+  if sysErr != nil { return sysErr }
+
+  fmt.Printf("Diastolic reading (mm Hg): ")
+  diastolic, diaErr := ValidatePressure(cleanReadString(reader))
+  if diaErr != nil { return diaErr }
+
+  fmt.Printf("Heart rate (bpm): ")
+  heartRate, hrErr := ValidateHeartRate(cleanReadString(reader))
+  if hrErr != nil { return hrErr }
+
+  fmt.Printf("Time of reading: ")
+  recordedAt := strings.TrimSpace(cleanReadString(reader))
+
+  fmt.Printf("Triple reading? (Y/N): ")
+  tripleReading := ValidateTripleReading(cleanReadString(reader))
+
+  fmt.Printf("Notes (optional): ")
+  notes := ValidateNotes(cleanReadString(reader))
+
+  fmt.Printf("Sys: %d | Dia: %d | HR: %d | recordedAt: %s | tripleReading: %t | notes: %s\n", systolic, diastolic, heartRate, recordedAt, tripleReading, notes)
+
+  return nil
+}
 
 func inputMeditation() { fmt.Println("To be implemented") }
 
