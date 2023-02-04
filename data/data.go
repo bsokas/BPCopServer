@@ -9,7 +9,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-var db *sql.DB
+var BPDatabase *sql.DB
 
 const BETA_DB_NAME = "blood_pressure"
 
@@ -24,12 +24,12 @@ func Connect() {
 	}
 
 	var openErr error
-	db, openErr = sql.Open("mysql", config.FormatDSN())
+	BPDatabase, openErr = sql.Open("mysql", config.FormatDSN())
 	if openErr != nil {
 		log.Fatal(openErr)
 	}
 
-	if pingErr := db.Ping(); pingErr != nil {
+	if pingErr := BPDatabase.Ping(); pingErr != nil {
 		log.Fatal(pingErr)
 	}
 
