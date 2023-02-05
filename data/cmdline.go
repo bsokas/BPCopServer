@@ -19,21 +19,21 @@ func startCmdLine() {
     reader := bufio.NewReader(os.Stdin)
 
     for {
-      fmt.Println()
-      fmt.Println("Available operations: ")
+      fmt.Println("\nAvailable operations: ")
       fmt.Println("1. Input blood pressure reading")
       fmt.Println("2. Input meditation log")
       fmt.Println("3. Print blood pressure readings")
       fmt.Println("4. Print meditiations logs")
-      fmt.Println("Type 'exit' or CTRL-C to stop")
-      fmt.Println()
+      fmt.Println("Type 'exit' or CTRL-C to stop\n")
 
       fmt.Print("Enter the operation number to continue: ")
       if option, readErr := reader.ReadString('\n'); readErr == nil {
         trimmed := strings.TrimSpace(option)
         switch trimmed {
         case "1":
-          inputBP(reader)
+          if bpErr := inputBP(reader); bpErr != nil {
+            log.Fatal(bpErr)
+          }
         case "2":
           inputMeditation()
         case "3":
@@ -59,10 +59,7 @@ func cleanReadString(reader *bufio.Reader) string {
   return val
 }
 
-// result, err := db.Exec("INSERT INTO album (title, artist, price) VALUES (?, ?, ?)", alb.Title, alb.Artist, alb.Price)
-
 func inputBP(reader *bufio.Reader) error {
-  // result, err := BPDatabase.Exec("")
   fmt.Printf("Systolic reading (mm Hg): ")
   systolic, sysErr := ValidatePressure(cleanReadString(reader))
   if sysErr != nil { return sysErr }
@@ -75,7 +72,7 @@ func inputBP(reader *bufio.Reader) error {
   heartRate, hrErr := ValidateHeartRate(cleanReadString(reader))
   if hrErr != nil { return hrErr }
 
-  fmt.Printf("Time of reading: ")
+  fmt.Printf("Time of reading (format YYYY-MM-DD hh:mm:ss): ")
   recordedAt := strings.TrimSpace(cleanReadString(reader))
 
   fmt.Printf("Triple reading? (Y/N): ")
@@ -84,7 +81,19 @@ func inputBP(reader *bufio.Reader) error {
   fmt.Printf("Notes (optional): ")
   notes := ValidateNotes(cleanReadString(reader))
 
-  fmt.Printf("Sys: %d | Dia: %d | HR: %d | recordedAt: %s | tripleReading: %t | notes: %s\n", systolic, diastolic, heartRate, recordedAt, tripleReading, notes)
+  result, insertErr := BPDatabase.Exec(`INSERT INTO blood_pressure_reading
+    (systolic_mm_hg, diastolic_mm_hg, heart_rate_bpm, recorded_at, triple_reading, notes)
+    VALUES (?, ?, ?, ?, ?, ?)`, systolic, diastolic, heartRate, recordedAt, tripleReading, notes)
+  if insertErr != nil {
+    return insertErr
+  }
+
+  if id, idErr := result.LastInsertId(); idErr != nil {
+    return idErr
+  } else {
+    fmt.Printf("Successfully added new blood pressure reading, record %d\n", id)
+    fmt.Printf("Sys: %d | Dia: %d | HR: %d | recordedAt: %s | tripleReading: %t | notes: %s\n", systolic, diastolic, heartRate, recordedAt, tripleReading, notes)
+  }
 
   return nil
 }
@@ -99,7 +108,6 @@ func readBloodPressure() {
 
   defer rows.Close()
 
-  // This only works for blood_pressure_reading rows
   for rows.Next() {
     var reading BloodPressureReading
     if readErr := rows.Scan(&reading.ID, &reading.SystolicMMHg, &reading.DiastolicMMHg, &reading.HeartRateBpm, &reading.CreatedAt, &reading.RecordedAt, &reading.TripleReading, &reading.Notes); readErr != nil {
