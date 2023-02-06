@@ -19,6 +19,7 @@ type MeditationLog struct {
   ID int
   CreatedAt string
   MeditatedAt string
+  DurationSeconds int
   Rating uint8
   Comments string
 }

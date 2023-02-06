@@ -24,7 +24,7 @@ func startCmdLine() {
       fmt.Println("2. Input meditation log")
       fmt.Println("3. Print blood pressure readings")
       fmt.Println("4. Print meditiations logs")
-      fmt.Println("Type 'exit' or CTRL-C to stop\n")
+      fmt.Printf("Type 'exit' or CTRL-C to stop\n\n")
 
       fmt.Print("Enter the operation number to continue: ")
       if option, readErr := reader.ReadString('\n'); readErr == nil {
@@ -35,7 +35,9 @@ func startCmdLine() {
             log.Fatal(bpErr)
           }
         case "2":
-          inputMeditation()
+          if medErr := inputMeditation(reader); medErr != nil {
+            log.Fatal(medErr)
+          }
         case "3":
           readBloodPressure()
         case "4":
@@ -98,7 +100,29 @@ func inputBP(reader *bufio.Reader) error {
   return nil
 }
 
-func inputMeditation() { fmt.Println("To be implemented") }
+func inputMeditation(reader *bufio.Reader) error {
+   fmt.Printf("Date & time of meditation (format YYYY-MM-DD hh:mm:ss): ")
+   meditatedAt := strings.TrimSpace(cleanReadString(reader))
+
+   fmt.Printf("Session rating (1-5, 5 as most relaxed): ")
+   rating, ratingErr := ValidateRating(cleanReadString(reader))
+   if ratingErr != nil { return ratingErr }
+
+   fmt.Printf("Duration of meditation, in minutes: ")
+   durationSec, durErr := ValidateDurationSeconds(cleanReadString(reader))
+   if durErr != nil { return durErr }
+
+   fmt.Printf("Any comments to add? (optional): ")
+   comments := ValidateComments(cleanReadString(reader))
+
+   newId, err := UpsertMeditationLog(meditatedAt, rating, durationSec, comments)
+   if err != nil {
+     return err
+   }
+
+   fmt.Printf("Successfully added meditation log with ID %d\n", newId)
+   return nil
+}
 
 func readBloodPressure() {
   rows, readErr := BPDatabase.Query("SELECT * FROM blood_pressure_reading")
