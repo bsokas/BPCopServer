@@ -109,7 +109,7 @@ func inputMeditation(reader *bufio.Reader) error {
    if ratingErr != nil { return ratingErr }
 
    fmt.Printf("Duration of meditation, in minutes: ")
-   durationSec, durErr := ValidateDurationSeconds(cleanReadString(reader))
+   durationSec, durErr := DurationMinToSeconds(cleanReadString(reader))
    if durErr != nil { return durErr }
 
    fmt.Printf("Any comments to add? (optional): ")
@@ -150,7 +150,7 @@ func readMeditation() {
 
   for rows.Next() {
     var medLog MeditationLog
-    if readErr := rows.Scan(&medLog.ID, &medLog.CreatedAt, &medLog.MeditatedAt, &medLog.Rating, &medLog.Comments); readErr != nil {
+    if readErr := rows.Scan(&medLog.ID, &medLog.CreatedAt, &medLog.MeditatedAt, &medLog.DurationSeconds, &medLog.Rating, &medLog.Comments); readErr != nil {
       log.Fatal(readErr)
     }
 

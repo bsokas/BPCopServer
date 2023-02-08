@@ -35,5 +35,33 @@ func TestValidateRatingInvalidRange(t *testing.T) {
   }
 }
 
-// TODO
-func TestValidateRatingInvalidInput(t *testing.T) {}
+func TestValidateRatingInvalidInput(t *testing.T) {
+  rating := "abc123"
+  _, err := ValidateRating(rating)
+  if err == nil {
+    t.Fatal("Expected error when passing invalid value")
+  }
+}
+
+func TestDurationMinToSeconds(t *testing.T) {
+  durationStr := "   10   "
+  result, err := DurationMinToSeconds(durationStr)
+  if err != nil {
+    t.Fatal(err)
+  }
+
+  expected := 600
+  if result != expected {
+    t.Fatalf("Expected value of %d, instead received %d\n", expected, result)
+  }
+}
+
+func TestValidateDurationSecondsNegative(t *testing.T) {
+  durationNeg := "-40"
+  _, err := DurationMinToSeconds(durationNeg)
+  if err == nil {
+    t.Fatal("Expected error when passing in a negative input\n")
+  } else if !strings.Contains(err.Error(), "Did you only meditate for a few seconds") {
+    t.Fatal("Function returned error, but the wrong error")
+  }
+}

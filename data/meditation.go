@@ -30,7 +30,7 @@ func ValidateRating(ratingStr string) (int, error) {
   return rating, nil
 }
 
-func ValidateDurationSeconds(durationMinStr string) (int, error) {
+func DurationMinToSeconds(durationMinStr string) (int, error) {
   minInt, err := strconv.Atoi(strings.TrimSpace(durationMinStr))
   if err != nil {
     return -1, err
