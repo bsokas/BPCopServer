@@ -2,9 +2,9 @@
 package data
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
-	"database/sql"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -15,11 +15,11 @@ const BETA_DB_NAME = "blood_pressure"
 
 func Connect() {
 	config := mysql.Config{
-		User:   "root",
-		Passwd: "",
-		Net:    "tcp",
-		Addr:   "127.0.0.1:3306",
-		DBName: BETA_DB_NAME,
+		User:                 "root",
+		Passwd:               "",
+		Net:                  "tcp",
+		Addr:                 "127.0.0.1:3306",
+		DBName:               BETA_DB_NAME,
 		AllowNativePasswords: true,
 	}
 
