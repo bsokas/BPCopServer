@@ -8,6 +8,28 @@ import (
 
 const MaxBPMMHg = 370
 
+func GetBPReadings(selectAll bool, ids ...[]string) ([]BloodPressureReading , error) {
+	// TODO add reading specific values
+	rows, readErr := BPDatabase.Query("SELECT * FROM blood_pressure_reading")
+	if readErr != nil {
+		return nil, readErr
+	}
+
+	defer rows.Close()
+
+	readings := make([]BloodPressureReading, 0)
+	for rows.Next() {
+		var reading BloodPressureReading
+		if readErr := rows.Scan(&reading.ID, &reading.SystolicMMHg, &reading.DiastolicMMHg, &reading.HeartRateBpm, &reading.CreatedAt, &reading.RecordedAt, &reading.TripleReading, &reading.Notes); readErr != nil {
+			return nil, readErr
+		}
+
+		readings = append(readings, reading)
+	}
+
+	return readings, nil
+}
+
 func ValidatePressure(pressure string) (int, error) {
 	mmHg, err := strconv.Atoi(strings.TrimSpace(pressure))
 	if err != nil {

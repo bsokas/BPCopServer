@@ -5,14 +5,14 @@ const DBName = "blood_pressure"
 // TODO table name list?
 
 type BloodPressureReading struct {
-	ID            int
-	SystolicMMHg  int
-	DiastolicMMHg int
-	HeartRateBpm  int
-	CreatedAt     string
-	RecordedAt    string
-	TripleReading bool
-	Notes         string
+	ID            int `json:"id"`
+	SystolicMMHg  int	`json:"systolicMMHg"`
+	DiastolicMMHg int `json:"diastolicMMHg"`
+	HeartRateBpm  int `json:"heartRateBpm"`
+	CreatedAt     string `json:"createdAt"`
+	RecordedAt    string `json:"recordedAt"`
+	TripleReading bool `json:"tripleReading"`
+	Notes         string `json:"Notes"`
 }
 
 type MeditationLog struct {

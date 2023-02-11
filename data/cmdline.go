@@ -135,20 +135,13 @@ func inputMeditation(reader *bufio.Reader) error {
 }
 
 func readBloodPressure() {
-	rows, readErr := BPDatabase.Query("SELECT * FROM blood_pressure_reading")
-	if readErr != nil {
-		log.Fatal(readErr)
+	readings, err := GetBPReadings(true)
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		var reading BloodPressureReading
-		if readErr := rows.Scan(&reading.ID, &reading.SystolicMMHg, &reading.DiastolicMMHg, &reading.HeartRateBpm, &reading.CreatedAt, &reading.RecordedAt, &reading.TripleReading, &reading.Notes); readErr != nil {
-			log.Fatal(readErr)
-		}
-
-		fmt.Printf("%+v\n", reading)
+	
+	for _, reading := range readings {
+			fmt.Printf("%+v\n", reading)
 	}
 }
 
