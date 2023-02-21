@@ -12,7 +12,7 @@ type BloodPressureReading struct {
 	CreatedAt     string `json:"createdAt"`
 	RecordedAt    string `json:"recordedAt"`
 	TripleReading bool `json:"tripleReading"`
-	Notes         string `json:"Notes"`
+	Notes         string `json:"notes"`
 }
 
 type MeditationLog struct {

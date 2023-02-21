@@ -14,11 +14,17 @@ func SendAllBPReadings(w http.ResponseWriter) error {
     return readErr
   }
 
-  body, err := json.Marshal(readings)
+  // TODO might be worth typing this
+  respBody := map[string][]data.BloodPressureReading{
+    "readings": readings,
+  }
+  body, err := json.Marshal(respBody)
   if err != nil {
     return err
   }
 
+  // TODO not sure if there's a more effective way to handle CORS
+  w.Header().Set("Access-Control-Allow-Origin", "*")
   w.Header().Set("Content-Type", "application/json")
   written, err := w.Write(body)
 
