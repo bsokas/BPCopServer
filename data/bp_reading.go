@@ -8,7 +8,7 @@ import (
 
 const MaxBPMMHg = 370
 
-func GetBPReadings(selectAll bool, ids ...[]string) ([]BloodPressureReading , error) {
+func GetBPReadings(selectAll bool, ids ...[]string) ([]BloodPressureReading, error) {
 	// TODO add reading specific values
 	rows, readErr := BPDatabase.Query("SELECT * FROM blood_pressure_reading")
 	if readErr != nil {
@@ -28,6 +28,22 @@ func GetBPReadings(selectAll bool, ids ...[]string) ([]BloodPressureReading , er
 	}
 
 	return readings, nil
+}
+
+// Adds BP entry in the database for the input reading, fields are assumed as accurate
+// Returns error if failure, new ID of the reading otherwise
+func CreateBPReading(newReading BloodPressureReading) (int64, error) {
+	result, err := BPDatabase.Exec(`INSERT INTO blood_pressure_reading
+		(systolic_mm_hg, diastolic_mm_hg, heart_rate_bpm, recorded_at, triple_reading, notes)
+		VALUES (?, ?, ?, ?, ?, ?)`, newReading.SystolicMMHg,
+		newReading.DiastolicMMHg, newReading.HeartRateBpm, newReading.RecordedAt,
+		newReading.TripleReading, newReading.Notes)
+
+	if err != nil {
+		return -1, err
+	}
+
+	return result.LastInsertId()
 }
 
 func ValidatePressure(pressure string) (int, error) {

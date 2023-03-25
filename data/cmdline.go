@@ -26,6 +26,7 @@ func startCmdLine() {
 		fmt.Println("4. Print meditiations logs")
 		fmt.Printf("Type 'exit' or CTRL-C to stop\n\n")
 
+		fmt.Println("Request logs will appear beneath the actions prompt")
 		fmt.Print("Enter the operation number to continue: ")
 		if option, readErr := reader.ReadString('\n'); readErr == nil {
 			trimmed := strings.TrimSpace(option)
@@ -139,9 +140,9 @@ func readBloodPressure() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	for _, reading := range readings {
-			fmt.Printf("%+v\n", reading)
+		fmt.Printf("%+v\n", reading)
 	}
 }
 

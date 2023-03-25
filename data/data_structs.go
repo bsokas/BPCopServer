@@ -3,15 +3,18 @@ package data
 const DBName = "blood_pressure"
 
 // TODO table name list?
+type CreateSuccessResponse struct {
+	ID int64 `json:"id"`
+}
 
 type BloodPressureReading struct {
-	ID            int `json:"id"`
-	SystolicMMHg  int	`json:"systolicMMHg"`
-	DiastolicMMHg int `json:"diastolicMMHg"`
-	HeartRateBpm  int `json:"heartRateBpm"`
+	ID            int    `json:"id"`
+	SystolicMMHg  int    `json:"systolicMMHg"`
+	DiastolicMMHg int    `json:"diastolicMMHg"`
+	HeartRateBpm  int    `json:"heartRateBpm"`
 	CreatedAt     string `json:"createdAt"`
 	RecordedAt    string `json:"recordedAt"`
-	TripleReading bool `json:"tripleReading"`
+	TripleReading bool   `json:"tripleReading"`
 	Notes         string `json:"notes"`
 }
 
