@@ -5,9 +5,19 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"fmt"
 
 	"github.com/bsokas/BPCopServer/data"
 )
+
+type BloodPressurePostBody struct {
+	SystolicMMHg int
+	DiastolicMMHg int
+	HeartRateBpm int 
+	TripleReading bool
+	Notes string
+	RecordedAt string
+}
 
 func SendAllBPReadings(w http.ResponseWriter) error {
 	readings, readErr := data.GetBPReadings(true)
@@ -41,20 +51,29 @@ func EnterNewBPReading(req *http.Request, w http.ResponseWriter) {
 	defer req.Body.Close()
 
 	decoder := json.NewDecoder(req.Body)
-	var reading data.BloodPressureReading
-	if err := decoder.Decode(&reading); err != nil && err != io.EOF {
+	var newReading BloodPressureEntryRequest
+	if err := decoder.Decode(&newReading); err != nil && err != io.EOF {
 		// TODO worth migrating error handling to a helper
+		fmt.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	ParseJSONRecordedAt(&newReading)
 
-	newId, createErr := data.CreateBPReading(reading)
+	newId, createErr := data.CreateBPReading(data.BloodPressureReading{
+		SystolicMMHg: newReading.SystolicMMHg,
+		DiastolicMMHg: newReading.DiastolicMMHg,
+		HeartRateBpm: newReading.HeartRateBpm,
+		RecordedAt: newReading.RecordedAt,
+		TripleReading: newReading.TripleReading,
+		Notes: newReading.Notes,
+	})
+
 	if createErr != nil {
 		http.Error(w, createErr.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// fmt.Printf("Pressure: %d/%d, Heart Rate: %d\n", reading.SystolicMMHg, reading.DiastolicMMHg, reading.HeartRateBpm)
 	body, writeErr := json.Marshal(data.CreateSuccessResponse{newId})
 	if writeErr != nil {
 		http.Error(w, writeErr.Error(), http.StatusInternalServerError)
@@ -62,8 +81,6 @@ func EnterNewBPReading(req *http.Request, w http.ResponseWriter) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
 	_, err := w.Write(body)
 	if err != nil {
 		log.Fatal(err.Error())

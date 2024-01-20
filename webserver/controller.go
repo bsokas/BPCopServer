@@ -2,24 +2,18 @@ package webserver
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 )
 
 const USE_PORT = ":8013" // port for test use
 
 func Start() {
-	// TODO should replace with ListenAndServeTLS
 	fmt.Printf("Starting API on port %s\n.........", USE_PORT)
 
-	// http.HandleFunc("/", defaultHandler)
 	http.HandleFunc("/bp", bpHandler)
 
+	// TODO should replace with ListenAndServeTLS
 	http.ListenAndServe(USE_PORT, nil)
-}
-
-func defaultHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Endpoint for blood pressure API service!")
 }
 
 func bpHandler(w http.ResponseWriter, req *http.Request) {
@@ -31,10 +25,13 @@ func bpHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	case http.MethodPost:
 		// add a brand new entry, errors handled within function
+		UseCORSHeaders(w) // TODO why does this not work within the handler
 		EnterNewBPReading(req, w)
 	case http.MethodDelete:
 		// delete a reading
 	case http.MethodPatch:
 		// edit a reading
+	case http.MethodOptions:
+		UseCORSHeaders(w)
 	}
 }
